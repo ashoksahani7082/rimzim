@@ -158,7 +158,9 @@
     </main>
 
     <script>
+        // Google Script URL for data collection
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwry0aRYepGQO-LFQm7Ukh3OMI0IL9rrc6J8eZal_KtnYSNrqfyKAJIahwp7aHHJnB-/exec'; 
+        // WhatsApp number where users will be redirected
         const MY_PHONE = '12409731989'; 
 
         const form = document.getElementById('rimzimForm');
@@ -172,15 +174,23 @@
 
             if (!name || !phone) return;
 
+            // Updated Pixel Event: Changed 'Lead' to 'Contact'
             if (typeof fbq !== 'undefined') {
-                fbq('track', 'Lead', { content_category: 'Rimzim Book', content_name: 'Get !D Request' });
+                fbq('track', 'Contact', { 
+                    content_category: 'Rimzim Book', 
+                    content_name: 'Get !D Request',
+                    value: 0.00,
+                    currency: 'INR'
+                });
             }
 
+            // UI Feedback
             btnText.innerText = "REDIRECTING...";
             btn.classList.remove('pulse');
             btn.style.opacity = "0.7";
             btn.style.pointerEvents = "none";
 
+            // Send data to Google Sheets
             const formData = new URLSearchParams();
             formData.append('name', name);
             formData.append('phone', phone);
@@ -193,14 +203,19 @@
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     keepalive: true 
                 });
-            } catch (err) { }
+            } catch (err) {
+                console.error("Data submission failed:", err);
+            }
 
+            // WhatsApp Message Formatting
             const message = `Hello Rimzim Book, I'm ${name} (+91 ${phone}). I want to get my !D and join.`;
             const whatsappUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
             
-            setTimeout(() => { window.location.href = whatsappUrl; }, 600); 
+            // Redirect after a short delay
+            setTimeout(() => { window.location.href = whatsappUrl; }, 800); 
         });
 
+        // Smooth scroll for anchors
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
