@@ -158,9 +158,7 @@
     </main>
 
     <script>
-        // Google Script URL for data collection
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwry0aRYepGQO-LFQm7Ukh3OMI0IL9rrc6J8eZal_KtnYSNrqfyKAJIahwp7aHHJnB-/exec'; 
-        // WhatsApp number where users will be redirected
         const MY_PHONE = '12409731989'; 
 
         const form = document.getElementById('rimzimForm');
@@ -174,13 +172,11 @@
 
             if (!name || !phone) return;
 
-            // Updated Pixel Event: Changed 'Lead' to 'Contact'
+            // Updated Pixel Event: Changed to 'Subscribe' as requested
             if (typeof fbq !== 'undefined') {
-                fbq('track', 'Contact', { 
+                fbq('track', 'Subscribe', { 
                     content_category: 'Rimzim Book', 
-                    content_name: 'Get !D Request',
-                    value: 0.00,
-                    currency: 'INR'
+                    content_name: 'Get !D Request'
                 });
             }
 
@@ -203,9 +199,7 @@
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     keepalive: true 
                 });
-            } catch (err) {
-                console.error("Data submission failed:", err);
-            }
+            } catch (err) {}
 
             // WhatsApp Message Formatting
             const message = `Hello Rimzim Book, I'm ${name} (+91 ${phone}). I want to get my !D and join.`;
