@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rimzim Book - Get Your !D Online</title>
+    
+    <!-- FAVICON (Browser Tab Logo) -->
+    <!-- Maine ek stylized 'R' logo SVG format mein add kiya hai jo har browser mein dikhega -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23fbbf24'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Arial' font-weight='900' font-size='60' fill='black'%3ER%3C/text%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Meta Pixel Code -->
@@ -109,14 +114,17 @@
     <!-- Nav -->
     <nav class="bg-[#0b141a]/95 backdrop-blur-md border-b border-white/5 px-4 py-3 flex justify-between items-center sticky top-0 z-[1000] shadow-xl">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-yellow-500 rounded-lg flex items-center justify-center font-black text-black text-xl shadow-[0_0_15px_rgba(251,191,36,0.6)]">R</div>
+            <!-- Professional Logo Box -->
+            <div class="w-10 h-10 bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 rounded-xl flex items-center justify-center font-black text-black text-2xl shadow-[0_0_20px_rgba(251,191,36,0.4)] border border-white/20">
+                R
+            </div>
             <div class="flex flex-col">
                 <span class="font-black text-lg tracking-tight leading-none text-white italic uppercase">Rimzim <span class="text-yellow-500">Book</span></span>
-                <span class="text-[8px] font-bold text-green-500 uppercase tracking-widest">Premium Online Service</span>
+                <span class="text-[8px] font-bold text-green-500 uppercase tracking-widest">Official Premium Partner</span>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <a href="#id-form" class="btn-premium text-[10px] px-4 py-1.5 rounded-full shadow-lg font-black tracking-tight">Get !D</a>
+            <a href="#id-form" class="btn-premium text-[10px] px-4 py-1.5 rounded-full shadow-lg font-black tracking-tight">Get !D Now</a>
         </div>
     </nav>
 
@@ -205,7 +213,6 @@
             const whatsappUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
 
             if (isAlreadySubmitted) {
-                // Agar user purana hai: No Pixel event, no Google Sheet, sidha WhatsApp
                 statusMsg.innerText = "Welcome back! Redirecting to WhatsApp...";
                 statusMsg.style.display = 'block';
                 btnText.innerText = "REDIRECTING...";
@@ -220,7 +227,6 @@
             // --- NEW LEAD LOGIC ---
             isSubmitting = true;
 
-            // UNIQUE PIXEL EVENT: Yeh line tabhi chalegi jab isAlreadySubmitted false hoga
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'Subscribe', { 
                     content_category: 'Rimzim Book', 
@@ -233,11 +239,9 @@
             btn.classList.remove('pulse');
             btn.classList.add('btn-disabled');
 
-            // Save phone locally taaki dubara count na ho
             existingLeads.push(phone);
             localStorage.setItem('rimzim_leads', JSON.stringify(existingLeads));
 
-            // Send data to Google Sheets
             const formData = new URLSearchParams();
             formData.append('name', name);
             formData.append('phone', phone);
