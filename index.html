@@ -87,7 +87,6 @@
             pointer-events: none;
         }
 
-        /* Message Box Styling */
         #statusMsg {
             display: none;
             position: fixed;
@@ -166,7 +165,6 @@
             <p class="text-center mt-6 text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">🔒 Verified Secure Private Book Network</p>
         </div>
 
-        <!-- Footer Info -->
         <div class="text-center mb-10 px-6">
             <p class="text-white/40 text-[10px] md:text-xs font-medium italic leading-relaxed">
                 Advertising & Ad Setup professionally managed by <a href="https://primeboostmedia.site" target="_blank" class="text-yellow-500/80 underline hover:text-yellow-400 transition-colors font-bold">Prime Boost Media</a>. <br> High-quality traffic solutions for elite digital networks.
@@ -199,7 +197,7 @@
 
             if (!name || !phone) return;
 
-            // --- BUG FIX: CHECK FOR DUPLICATES IN LOCAL STORAGE ---
+            // --- DUPLICATE CHECK ---
             const existingLeads = JSON.parse(localStorage.getItem('rimzim_leads') || '[]');
             const isAlreadySubmitted = existingLeads.includes(phone);
 
@@ -207,9 +205,10 @@
             const whatsappUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
 
             if (isAlreadySubmitted) {
-                // Agar user pehle submit kar chuka hai
+                // Agar user purana hai: No Pixel event, no Google Sheet, sidha WhatsApp
+                statusMsg.innerText = "Welcome back! Redirecting to WhatsApp...";
                 statusMsg.style.display = 'block';
-                btnText.innerText = "OPENING WHATSAPP...";
+                btnText.innerText = "REDIRECTING...";
                 btn.classList.add('btn-disabled');
                 
                 setTimeout(() => { 
@@ -218,22 +217,23 @@
                 return;
             }
             
-            // --- NEW SUBMISSION LOGIC ---
+            // --- NEW LEAD LOGIC ---
             isSubmitting = true;
 
-            // Track Pixel Event
+            // UNIQUE PIXEL EVENT: Yeh line tabhi chalegi jab isAlreadySubmitted false hoga
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'Subscribe', { 
                     content_category: 'Rimzim Book', 
-                    content_name: 'Get !D Request'
+                    content_name: 'Get !D Request',
+                    status: 'New Lead'
                 });
             }
 
-            btnText.innerText = "REDIRECTING...";
+            btnText.innerText = "REGISTERING...";
             btn.classList.remove('pulse');
             btn.classList.add('btn-disabled');
 
-            // Save phone to local storage to prevent future duplicates
+            // Save phone locally taaki dubara count na ho
             existingLeads.push(phone);
             localStorage.setItem('rimzim_leads', JSON.stringify(existingLeads));
 
@@ -257,7 +257,6 @@
             }, 1000); 
         });
 
-        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
