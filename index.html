@@ -80,9 +80,32 @@
             background: rgba(255, 255, 255, 0.08) !important;
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.15);
         }
+        
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Message Box Styling */
+        #statusMsg {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            width: 90%;
+            max-width: 350px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Notification Message -->
+    <div id="statusMsg" class="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold text-center shadow-2xl border border-white/20">
+        Already Requested! Redirecting...
+    </div>
 
     <!-- Nav -->
     <nav class="bg-[#0b141a]/95 backdrop-blur-md border-b border-white/5 px-4 py-3 flex justify-between items-center sticky top-0 z-[1000] shadow-xl">
@@ -106,7 +129,6 @@
             </h1>
         </div>
 
-        <!-- Safe Warning Box -->
         <div class="mb-8 bg-white/5 border border-white/10 p-4 rounded-2xl text-center text-[9px] text-white/40 uppercase font-black tracking-[0.2em]">
             Strictly 18+ Only • Terms & Conditions Apply • Private Access Guaranteed
         </div>
@@ -144,14 +166,13 @@
             <p class="text-center mt-6 text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">🔒 Verified Secure Private Book Network</p>
         </div>
 
-        <!-- Bottom Description Section -->
+        <!-- Footer Info -->
         <div class="text-center mb-10 px-6">
             <p class="text-white/40 text-[10px] md:text-xs font-medium italic leading-relaxed">
                 Advertising & Ad Setup professionally managed by <a href="https://primeboostmedia.site" target="_blank" class="text-yellow-500/80 underline hover:text-yellow-400 transition-colors font-bold">Prime Boost Media</a>. <br> High-quality traffic solutions for elite digital networks.
             </p>
         </div>
 
-        <!-- Footer -->
         <div class="text-center opacity-20 text-[9px] font-black uppercase tracking-[0.5em] pb-16 italic">
             Official Rimzim Book • Instant Service Priority • Play Safely
         </div>
@@ -164,15 +185,43 @@
         const form = document.getElementById('rimzimForm');
         const btn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
+        const statusMsg = document.getElementById('statusMsg');
+        
+        let isSubmitting = false;
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            if (isSubmitting) return;
+
             const name = document.getElementById('userName').value.trim();
             const phone = document.getElementById('userPhone').value.trim();
 
             if (!name || !phone) return;
 
-            // Updated Pixel Event: Changed to 'Subscribe' as requested
+            // --- BUG FIX: CHECK FOR DUPLICATES IN LOCAL STORAGE ---
+            const existingLeads = JSON.parse(localStorage.getItem('rimzim_leads') || '[]');
+            const isAlreadySubmitted = existingLeads.includes(phone);
+
+            const message = `Hello Rimzim Book, I'm ${name} (+91 ${phone}). I want to get my !D and join.`;
+            const whatsappUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
+
+            if (isAlreadySubmitted) {
+                // Agar user pehle submit kar chuka hai
+                statusMsg.style.display = 'block';
+                btnText.innerText = "OPENING WHATSAPP...";
+                btn.classList.add('btn-disabled');
+                
+                setTimeout(() => { 
+                    window.location.href = whatsappUrl; 
+                }, 1200);
+                return;
+            }
+            
+            // --- NEW SUBMISSION LOGIC ---
+            isSubmitting = true;
+
+            // Track Pixel Event
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'Subscribe', { 
                     content_category: 'Rimzim Book', 
@@ -180,11 +229,13 @@
                 });
             }
 
-            // UI Feedback
             btnText.innerText = "REDIRECTING...";
             btn.classList.remove('pulse');
-            btn.style.opacity = "0.7";
-            btn.style.pointerEvents = "none";
+            btn.classList.add('btn-disabled');
+
+            // Save phone to local storage to prevent future duplicates
+            existingLeads.push(phone);
+            localStorage.setItem('rimzim_leads', JSON.stringify(existingLeads));
 
             // Send data to Google Sheets
             const formData = new URLSearchParams();
@@ -201,15 +252,12 @@
                 });
             } catch (err) {}
 
-            // WhatsApp Message Formatting
-            const message = `Hello Rimzim Book, I'm ${name} (+91 ${phone}). I want to get my !D and join.`;
-            const whatsappUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
-            
-            // Redirect after a short delay
-            setTimeout(() => { window.location.href = whatsappUrl; }, 800); 
+            setTimeout(() => { 
+                window.location.href = whatsappUrl; 
+            }, 1000); 
         });
 
-        // Smooth scroll for anchors
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
